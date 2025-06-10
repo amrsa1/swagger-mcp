@@ -1,6 +1,6 @@
 {
   "name": "swagger-mcp",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "MCP Server for Swagger/OpenAPI documentation and API testing",
   "main": "dist/server.js",
   "type": "module",
