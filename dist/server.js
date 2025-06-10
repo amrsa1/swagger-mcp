@@ -86,15 +86,7 @@ if (configLoadedFrom !== 'mcp.json' && process.env.API_BASE_URL) {
   configLoadedFrom = 'environment';
 }
 
-function maskSecret(secret) {
-  if (!secret) return '[MISSING]';
-  
-  return secret.length > 4 
-    ? secret.substring(0, 2) + '*'.repeat(secret.length - 4) + secret.slice(-2) 
-    : '*'.repeat(secret.length);
-}
-
-log.header('Starting API Test MCP Server');
+log.header('Starting Swagger API MCP Server');
 
 if (!API_BASE_URL) log.warning('API_BASE_URL not found in configuration');
 if (configLoadedFrom === 'default') log.warning('Some API configuration values missing from mcp.json');
@@ -104,7 +96,6 @@ ${chalk.bold('Docs URL:')} ${chalk.cyan(API_DOCS_URL || '[NOT SET - Using auto-d
 ${chalk.bold('API Key:')} ${chalk.cyan(API_KEY ? '[PRESENT]' : '[MISSING]')}
 ${chalk.bold('Source:')} ${chalk.cyan(configLoadedFrom)}
 `);
-
 
 const tools = [
   {
