@@ -37,7 +37,8 @@
     "build": "cp src/server.js dist/server.js && chmod +x dist/server.js",
     "prepublishOnly": "npm run build",
     "start": "node dist/server.js --stdio",
-    "dev": "node src/server.js --stdio"
+    "dev": "node src/server.js --stdio",
+    "test": "echo 'No tests specified' && exit 0"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
