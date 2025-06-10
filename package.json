@@ -34,7 +34,7 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "build": "cp src/server.js dist/server.js && chmod +x dist/server.js",
+    "build": "mkdir -p dist && cp src/server.js dist/server.js && chmod +x dist/server.js",
     "prepublishOnly": "npm run build",
     "start": "node dist/server.js --stdio",
     "dev": "node src/server.js --stdio",
