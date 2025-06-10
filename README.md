@@ -116,8 +116,8 @@ The server automatically detects configuration files from:
 
 ```bash
 # Clone the repository
-git clone https://github.com/amrsa1/SwaggerMCP.git
-cd SwaggerMCP
+git clone https://github.com/amrsa1/swagger-mcp.git
+cd swagger-mcp
 
 # Install dependencies
 npm install

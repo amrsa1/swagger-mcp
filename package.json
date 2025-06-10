@@ -1,6 +1,6 @@
 {
   "name": "swagger-mcp",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "MCP Server for Swagger/OpenAPI documentation and API testing",
   "main": "dist/server.js",
   "type": "module",
@@ -24,11 +24,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/amrsa1/SwaggerMCP.git"
+    "url": "git+https://github.com/amrsa1/swagger-mcp.git"
   },
-  "homepage": "https://github.com/amrsa1/SwaggerMCP#readme",
+  "homepage": "https://github.com/amrsa1/swagger-mcp#readme",
   "bugs": {
-    "url": "https://github.com/amrsa1/SwaggerMCP/issues"
+    "url": "https://github.com/amrsa1/swagger-mcp/issues"
   },
   "engines": {
     "node": ">=18.0.0"
