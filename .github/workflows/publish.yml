@@ -113,39 +113,107 @@ jobs:
           git push origin main
           git push origin ${{ steps.version.outputs.new_version }}
           
-      - name: Create GitHub release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.version.outputs.new_version }}
-          release_name: Release ${{ steps.version.outputs.new_version }}
-          body: |
-            ## Changes
-            
-            - Automated release for version ${{ steps.version.outputs.version_number }}
-            - See commit history for detailed changes
-            
-            ## Installation
-            
-            ```bash
-            npm install -g swagger-mcp@${{ steps.version.outputs.version_number }}
-            ```
-            
-            ## Configuration
-            
-            Add to your MCP settings:
-            
-            ```json
+      - name: Generate Release Notes
+        id: release_notes
+        run: |
+          # Get commit messages since last tag
+          LAST_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          if [ -z "$LAST_TAG" ]; then
+            COMMITS=$(git log --oneline --pretty=format:"- %s" -10)
+          else
+            COMMITS=$(git log --oneline --pretty=format:"- %s" ${LAST_TAG}..HEAD)
+          fi
+          
+          # Create release notes
+          cat << EOF > release_notes.md
+          ## 🚀 What's New in v${{ steps.version.outputs.version_number }}
+          
+          ### Changes
+          $COMMITS
+          
+          ### 📦 Installation
+          
+          **Global Installation (Recommended):**
+          \`\`\`bash
+          npm install -g swagger-mcp@${{ steps.version.outputs.version_number }}
+          \`\`\`
+          
+          **Or use with npx (no installation required):**
+          \`\`\`bash
+          npx swagger-mcp@${{ steps.version.outputs.version_number }}
+          \`\`\`
+          
+          ### ⚙️ Configuration Examples
+          
+          **VS Code (.vscode/mcp.json):**
+          \`\`\`json
+          {
             "swagger-mcp": {
               "command": "npx",
-              "args": ["-y", "swagger-mcp@latest"],
+              "args": ["-y", "swagger-mcp@${{ steps.version.outputs.version_number }}"],
               "env": {
                 "API_BASE_URL": "https://api.example.com",
                 "API_DOCS_URL": "https://api.example.com/swagger.json",
                 "API_KEY": "your-api-key-here"
               }
             }
-            ```
+          }
+          \`\`\`
+          
+          **Cursor (.cursor/mcp.json):**
+          \`\`\`json
+          {
+            "swagger-mcp": {
+              "command": "npx",
+              "args": ["-y", "swagger-mcp@${{ steps.version.outputs.version_number }}"],
+              "env": {
+                "API_BASE_URL": "https://api.example.com",
+                "API_DOCS_URL": "https://api.example.com/swagger.json"
+              }
+            }
+          }
+          \`\`\`
+          
+          **Windsurf (.windsurf/mcp.json):**
+          \`\`\`json
+          {
+            "swagger-mcp": {
+              "command": "npx",
+              "args": ["-y", "swagger-mcp@${{ steps.version.outputs.version_number }}"],
+              "env": {
+                "API_BASE_URL": "https://api.example.com",
+                "API_DOCS_URL": "https://api.example.com/swagger.json"
+              }
+            }
+          }
+          \`\`\`
+          
+          ### 🔧 Available Tools
+          - **fetch_swagger_info** - Get API overview and authentication requirements
+          - **list_endpoints** - List all available API endpoints with filtering
+          - **get_endpoint_details** - Get detailed information about specific endpoints
+          - **execute_api_request** - Execute API requests with authentication
+          - **validate_api_response** - Validate API responses against schema
+          
+          ### 🔑 Authentication Support
+          - API Keys (Header, Query Parameter)
+          - Bearer Tokens with auto-refresh
+          - Basic Authentication (Username/Password)
+          - Custom headers and dynamic token management
+          
+          For detailed documentation, visit: https://github.com/amrsa1/swagger-mcp
+          EOF
+          
+          echo "Generated release notes:"
+          cat release_notes.md
+
+      - name: Create GitHub release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version.outputs.new_version }}
+          release_name: "🚀 swagger-mcp v${{ steps.version.outputs.version_number }}"
+          body_path: release_notes.md
           draft: false
           prerelease: false
