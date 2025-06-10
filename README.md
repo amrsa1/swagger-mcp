@@ -11,6 +11,12 @@ A Model Context Protocol (MCP) server that provides tools for exploring and test
 - 🌐 **Flexible authentication** - supports API keys, basic auth, and bearer tokens
 - ⚡ **Auto-discovery** - can find documentation URLs automatically
 
+## Installation
+
+```bash
+npm install -g swagger-mcp
+```
+
 ## Configuration
 
 ### IDE Setup
@@ -67,6 +73,29 @@ Create an MCP configuration file in your IDE's configuration directory:
 }
 ```
 
+#### Option 3: Combined Authentication (API Key + Username/Password)
+
+```json
+{
+  "mcpServers": {
+    "swagger-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "swagger-mcp"
+      ],
+      "env": {
+        "API_BASE_URL": "https://api.example.com",
+        "API_DOCS_URL": "https://api.example.com/swagger.json",
+        "API_KEY": "your-api-key-here",
+        "API_USERNAME": "your-username",
+        "API_PASSWORD": "your-password"
+      }
+    }
+  }
+}
+```
+
 ## Configuration Options
 
 - `API_BASE_URL` - Base URL for your API (e.g., `https://api.example.com`) **[Required]**
@@ -87,22 +116,29 @@ The server intelligently handles authentication:
 ## Available Tools
 
 ### `fetch_swagger_info`
-Fetches and parses Swagger/OpenAPI documentation from a given URL.
+Fetches and parses Swagger/OpenAPI documentation from a given URL to discover available API endpoints.
 
-### `test_api_endpoint`
-Tests an API endpoint with specified parameters, headers, and authentication.
+### `list_endpoints`
+Lists all available API endpoints after fetching Swagger documentation, showing methods, paths, and summaries.
 
-### `explore_api_schema`
-Explores and explains API schemas and data structures from the documentation.
+### `get_endpoint_details`
+Gets detailed information about a specific API endpoint including parameters, request/response schemas, and examples.
+
+### `execute_api_request`
+Executes an API request to a specific endpoint with authentication, parameters, headers, and body handling.
+
+### `validate_api_response`
+Validates an API response against the schema definitions from Swagger documentation to ensure compliance.
 
 ## Usage Examples
 
 Once configured, you can use the MCP server in your AI-powered editor to:
 
 - **Explore APIs**: "Show me the available endpoints in this API"
-- **Test endpoints**: "Test all API endpoints in a blink"
+- **Test endpoints**: "Test the POST /users endpoint with this data"
 - **Understand schemas**: "Explain the User model structure"
-- **Debug API calls**: "Help in troubleshooting the APIs request"
+- **Debug API calls**: "Help me troubleshoot this API request"
+- **Validate responses**: "Check if this response matches the API schema"
 
 ## Supported IDEs
 
