@@ -1,17 +1,50 @@
 {
-  "name": "mcp-servers",
+  "name": "swagger-mcp",
   "version": "1.0.0",
-  "description": "MCP Servers for API testing",
-  "main": "server.js",
+  "description": "MCP Server for Swagger/OpenAPI documentation and API testing",
+  "main": "dist/server.js",
   "type": "module",
+  "bin": {
+    "swagger-mcp": "./dist/server.js"
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "swagger",
+    "openapi",
+    "api-testing",
+    "documentation"
+  ],
+  "author": "Amr Salem",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amrsa1/SwaggerMCP.git"
+  },
+  "homepage": "https://github.com/amrsa1/SwaggerMCP#readme",
+  "bugs": {
+    "url": "https://github.com/amrsa1/SwaggerMCP/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
-    "swagger": "node src/servers/api-server.js --stdio",
+    "build": "cp src/server.js dist/server.js && chmod +x dist/server.js",
+    "prepublishOnly": "npm run build",
+    "start": "node dist/server.js --stdio",
+    "dev": "node src/server.js --stdio"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
-    "axios": "^1.9.0",
     "chalk": "^5.4.1",
     "dotenv": "^16.5.0",
-    "node-fetch": "^2.7.0",
-  }
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {},
+  "peerDependencies": {}
 }
