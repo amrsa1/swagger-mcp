@@ -5,7 +5,7 @@
   "main": "dist/server.js",
   "type": "module",
   "bin": {
-    "swagger-mcp": "./dist/server.js"
+    "swagger-mcp": "dist/server.js"
   },
   "files": [
     "dist/",
@@ -24,7 +24,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/amrsa1/SwaggerMCP.git"
+    "url": "git+https://github.com/amrsa1/SwaggerMCP.git"
   },
   "homepage": "https://github.com/amrsa1/SwaggerMCP#readme",
   "bugs": {
