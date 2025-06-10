@@ -37,10 +37,8 @@ jobs:
       - name: Build project
         run: npm run build
         
-      - name: Test server startup
-        run: |
-          timeout 10s npm run dev || test $? = 124
-          echo "Server startup test completed"
+      - name: Test server initialization
+        run: npm test
 
   publish-npm:
     needs: build-and-test
@@ -69,6 +67,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
   version-and-release:
+    needs: build-and-test
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
     steps:
