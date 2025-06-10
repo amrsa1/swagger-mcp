@@ -11,12 +11,6 @@ A Model Context Protocol (MCP) server that provides tools for exploring and test
 - 🌐 **Flexible authentication** - supports API keys, basic auth, and bearer tokens
 - ⚡ **Auto-discovery** - can find documentation URLs automatically
 
-## Installation
-
-```bash
-npm install -g swagger-mcp
-```
-
 ## Configuration
 
 ### IDE Setup
@@ -30,23 +24,19 @@ Create an MCP configuration file in your IDE's configuration directory:
 
 ### Authentication Options
 
-#### Option 1: Using API Key (Recommended)
+#### Option 1: Using API Key
 
 ```json
-{
-  "mcpServers": {
-    "swagger-mcp": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "swagger-mcp"
-      ],
-      "env": {
-        "API_BASE_URL": "https://api.example.com",
-        "API_DOCS_URL": "https://api.example.com/swagger.json",
-        "API_KEY": "your-api-key-here"
-      }
-    }
+"swagger-mcp": {
+  "command": "npx",
+  "args": [
+    "-y",
+    "swagger-mcp@latest"
+  ],
+  "env": {
+    "API_BASE_URL": "https://api.example.com",
+    "API_DOCS_URL": "https://api.example.com/swagger.json",
+    "API_KEY": "your-api-key-here"
   }
 }
 ```
@@ -54,44 +44,17 @@ Create an MCP configuration file in your IDE's configuration directory:
 #### Option 2: Using Username and Password
 
 ```json
-{
-  "mcpServers": {
-    "swagger-mcp": {
-      "command": "npx",
-      "args": [
-        "-y", 
-        "swagger-mcp"
-      ],
-      "env": {
-        "API_BASE_URL": "https://api.example.com",
-        "API_DOCS_URL": "https://api.example.com/swagger.json",
-        "API_USERNAME": "your-username",
-        "API_PASSWORD": "your-password"
-      }
-    }
-  }
-}
-```
-
-#### Option 3: Combined Authentication (API Key + Username/Password)
-
-```json
-{
-  "mcpServers": {
-    "swagger-mcp": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "swagger-mcp"
-      ],
-      "env": {
-        "API_BASE_URL": "https://api.example.com",
-        "API_DOCS_URL": "https://api.example.com/swagger.json",
-        "API_KEY": "your-api-key-here",
-        "API_USERNAME": "your-username",
-        "API_PASSWORD": "your-password"
-      }
-    }
+"swagger-mcp": {
+  "command": "npx",
+  "args": [
+    "-y", 
+    "swagger-mcp@latest"
+  ],
+  "env": {
+    "API_BASE_URL": "https://api.example.com",
+    "API_DOCS_URL": "https://api.example.com/swagger.json",
+    "API_USERNAME": "your-username",
+    "API_PASSWORD": "your-password"
   }
 }
 ```
