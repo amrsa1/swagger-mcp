@@ -175,7 +175,6 @@ jobs:
           
           ### ⚙️ Configuration Examples
           
-          **VS Code (.vscode/mcp.json):**
           \`\`\`json
           {
             "swagger-mcp": {
@@ -185,34 +184,6 @@ jobs:
                 "API_BASE_URL": "https://api.example.com",
                 "API_DOCS_URL": "https://api.example.com/swagger.json",
                 "API_KEY": "your-api-key-here"
-              }
-            }
-          }
-          \`\`\`
-          
-          **Cursor (.cursor/mcp.json):**
-          \`\`\`json
-          {
-            "swagger-mcp": {
-              "command": "npx",
-              "args": ["-y", "swagger-mcp@${{ steps.version.outputs.version_number }}"],
-              "env": {
-                "API_BASE_URL": "https://api.example.com",
-                "API_DOCS_URL": "https://api.example.com/swagger.json"
-              }
-            }
-          }
-          \`\`\`
-          
-          **Windsurf (.windsurf/mcp.json):**
-          \`\`\`json
-          {
-            "swagger-mcp": {
-              "command": "npx",
-              "args": ["-y", "swagger-mcp@${{ steps.version.outputs.version_number }}"],
-              "env": {
-                "API_BASE_URL": "https://api.example.com",
-                "API_DOCS_URL": "https://api.example.com/swagger.json"
               }
             }
           }
