@@ -12,37 +12,78 @@ import fs from 'fs';
 import path from 'path';
 import chalk from 'chalk';
 import { URL } from 'url';
+import { readFileSync } from 'fs';
+
+const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+const VERSION = packageJson.version;
 
 chalk.level = 2;
 
 dotenv.config();
 
-const log = {
-  info: (msg) => console.error(`${chalk.cyan('\nℹ️  INFO')}: ${msg}`),
-  success: (msg) => console.error(`${chalk.green('\n✓ SUCCESS')}: ${msg}`),
-  error: (msg) => console.error(`${chalk.red('\n✗ ERROR')}: ${msg}`),
-  warning: (msg) => console.error(`${chalk.yellow('\n⚠️  WARNING')}: ${msg}`),
-  debug: (msg) => console.error(`${chalk.dim('\n🔍 DEBUG')}: ${msg}`),
-  divider: () => console.error(chalk.magenta('═'.repeat(50))),
-  header: (title) => {
-    console.error(chalk.magenta('═'.repeat(50)));
-    console.error(chalk.bold.cyan(title));
-    console.error(chalk.magenta('═'.repeat(50)));
+const Colors = {
+  RESET: chalk.reset,
+  SUCCESS: chalk.hex('#32CD32').bold,
+  ERROR: chalk.hex('#FF6B6B').bold,
+  WARNING: chalk.hex('#FFB347'),
+  INFO: chalk.hex('#87CEEB'),
+  DEBUG: chalk.hex('#888888'),
+  DIVIDER: chalk.hex('#555555'),
+  HEADER: chalk.hex('#9B59B6').bold,
+  ACCENT: chalk.hex('#F39C12'),
+  API_METHOD: chalk.hex('#4A90E2').bold,
+  API_URL: chalk.hex('#E8E8E8'),
+};
+
+const UI = {
+  newLine: () => console.error(''),
+  
+  separator: () => console.error(Colors.DIVIDER('─'.repeat(50))),
+  thickSeparator: () => console.error(Colors.DIVIDER('━'.repeat(50))),
+  
+  success: (msg) => console.error(`${Colors.SUCCESS('✓')} ${Colors.INFO(msg)}`),
+  error: (msg) => console.error(`${Colors.ERROR('✗')} ${Colors.ERROR(msg)}`),
+  warning: (msg) => console.error(`${Colors.WARNING('⚠')} ${Colors.WARNING(msg)}`),
+  info: (msg) => console.error(`${Colors.INFO('ℹ')} ${Colors.INFO(msg)}`),
+  debug: (msg) => console.error(`${Colors.DEBUG('◦')} ${Colors.DEBUG(msg)}`),
+  
+  api: (method, url) => console.error(`${Colors.API_METHOD(method)} ${Colors.API_URL(url)}`),
+  
+  header: (text) => {
+    console.error('');
+    console.error(Colors.HEADER(text));
+    console.error(Colors.DIVIDER('─'.repeat(text.length)));
   },
-  api: (method, url) => console.error(`${chalk.blue(method)} ${chalk.dim(url)}`)
+  
+  banner: (name, version) => {
+    console.error('');
+    console.error(Colors.HEADER('🚀 ') + Colors.ACCENT(`${name}`) + Colors.HEADER(` v${version}`));
+    console.error(Colors.INFO('   MCP Server - Model Context Protocol'));
+    console.error('');
+  }
+};
+
+const log = {
+  info: (msg) => UI.info(msg),
+  success: (msg) => UI.success(msg),
+  error: (msg) => UI.error(msg),
+  warning: (msg) => UI.warning(msg),
+  debug: (msg) => UI.debug(msg),
+  api: (method, url) => UI.api(method, url),
+  header: (title) => UI.header(title),
+  banner: (name, version) => UI.banner(name, version)
 };
 
 let API_BASE_URL, API_DOCS_URL, API_KEY, API_USERNAME, API_PASSWORD;
 let configLoadedFrom = 'default';
 
-// Function to find MCP configuration from various IDEs
 function findMcpConfig() {
   const possiblePaths = [
-    '.vscode/mcp.json',     // VS Code
-    '.cursor/mcp.json',     // Cursor
-    '.windsurf/mcp.json',   // Windsurf
-    'mcp.json',             // Root directory fallback
-    '.mcp/config.json'      // Alternative config location
+    '.vscode/mcp.json',
+    '.cursor/mcp.json',
+    '.windsurf/mcp.json',
+    'mcp.json',
+    '.mcp/config.json'
   ];
   
   for (const configPath of possiblePaths) {
@@ -86,16 +127,29 @@ if (configLoadedFrom !== 'mcp.json' && process.env.API_BASE_URL) {
   configLoadedFrom = 'environment';
 }
 
-log.header('Starting Swagger API MCP Server');
+log.banner('Swagger API MCP Server', VERSION);
 
-if (!API_BASE_URL) log.warning('API_BASE_URL not found in configuration');
-if (configLoadedFrom === 'default') log.warning('Some API configuration values missing from mcp.json');
+UI.header('📋 Configuration');
+if (!API_BASE_URL) {
+  UI.warning('API_BASE_URL not found in configuration');
+} else {
+  UI.info(`Base URL: ${API_BASE_URL}`);
+}
 
-console.error(`${chalk.bold('Base URL:')} ${chalk.cyan(API_BASE_URL || '[MISSING]')}
-${chalk.bold('Docs URL:')} ${chalk.cyan(API_DOCS_URL || '[NOT SET - Using auto-discovery]')}
-${chalk.bold('API Key:')} ${chalk.cyan(API_KEY ? '[PRESENT]' : '[MISSING]')}
-${chalk.bold('Source:')} ${chalk.cyan(configLoadedFrom)}
-`);
+if (API_DOCS_URL) {
+  UI.info(`Docs URL: ${API_DOCS_URL}`);
+} else {
+  UI.info('Docs URL: Auto-discovery mode');
+}
+
+UI.info(`API Key: ${API_KEY ? 'Present' : 'Missing'}`);
+UI.info(`Config Source: ${configLoadedFrom}`);
+
+if (configLoadedFrom === 'default') {
+  UI.warning('Some API configuration values missing from MCP config');
+}
+
+UI.newLine();
 
 const tools = [
   {
@@ -200,7 +254,7 @@ const tools = [
 const server = new Server(
   {
     name: "swagger-mcp",
-    version: "1.0.0",
+    version: VERSION,
   },
   {
     capabilities: {
@@ -302,7 +356,7 @@ async function fetchSwaggerDoc(url = null) {
     }
     
     if (API_DOCS_URL) {
-      log.info(`Trying to fetch Swagger doc from configured docs URL: ${API_DOCS_URL}`);
+      log.info(`Trying configured docs URL: ${API_DOCS_URL}`);
       try {
         const response = await fetch(API_DOCS_URL, {
           method: 'GET',
@@ -321,12 +375,11 @@ async function fetchSwaggerDoc(url = null) {
           
           return doc;
         } else {
-          log.warning(`Failed to fetch from configured docs URL: ${response.status} ${response.statusText}`);
+          log.debug(`Failed to fetch from configured docs URL: ${response.status} ${response.statusText}`);
           
-          // Try with .json extension if it doesn't have one
           if (!API_DOCS_URL.endsWith('.json')) {
             const jsonUrl = `${API_DOCS_URL}.json`;
-            log.info(`Trying with .json extension: ${jsonUrl}`);
+            log.debug(`Trying with .json extension: ${jsonUrl}`);
             const jsonResponse = await fetch(jsonUrl, {
               method: 'GET',
               headers: {
@@ -347,7 +400,7 @@ async function fetchSwaggerDoc(url = null) {
           }
         }
       } catch (error) {
-        log.warning(`Error fetching from configured docs URL: ${error.message}`);
+        log.debug(`Error fetching from configured docs URL: ${error.message}`);
       }
     }
     
@@ -373,10 +426,13 @@ async function fetchSwaggerDoc(url = null) {
       '/docs/swagger.json'
     ];
     
-    // Try each common path
+    log.info(`Auto-discovering Swagger docs from ${commonPaths.length} common paths...`);
+    
+    let attemptCount = 0;
+    
     for (const path of commonPaths) {
       const testUrl = buildUrl(path);
-      log.info(`Trying to fetch Swagger doc from: ${testUrl}`);
+      attemptCount++;
       
       try {
         const response = await fetch(testUrl, { 
@@ -398,13 +454,17 @@ async function fetchSwaggerDoc(url = null) {
             
             return doc;
           } else {
-            log.info(`Found path ${testUrl} but content type is not JSON: ${contentType}`);
+            log.debug(`Found path ${testUrl} but content type is not JSON: ${contentType}`);
           }
         }
       } catch (e) {
-        log.debug(`Failed to fetch from ${testUrl}: ${e.message}`);
+        if (attemptCount <= 3) {
+          log.debug(`Failed to fetch from ${testUrl}: ${e.message}`);
+        }
       }
     }
+    
+    log.debug(`Attempted ${attemptCount} common paths for Swagger documentation`);
     
     throw new Error('Could not find Swagger documentation at any common paths. Please provide explicit URL.');
   } catch (error) {
@@ -703,17 +763,14 @@ function determineAuthHeader(path, method) {
     
     if (securityRequirements.length > 0) {
       for (const secReq of securityRequirements) {
-        // Get the first security scheme name
         const securitySchemeName = Object.keys(secReq)[0];
         if (!securitySchemeName) continue;
         
-        // Find the security scheme definition
         const securitySchemes = swaggerDoc.components?.securitySchemes;
         if (!securitySchemes || !securitySchemes[securitySchemeName]) continue;
         
         const scheme = securitySchemes[securitySchemeName];
         
-        // Handle different security schemes
         switch (scheme.type) {
           case 'http':
             if (scheme.scheme === 'bearer') {
@@ -731,12 +788,10 @@ function determineAuthHeader(path, method) {
               return { [scheme.name]: API_KEY };
             }
             break;
-          // OAuth2 and other schemes could be added here
         }
       }
     }
     
-    // If we couldn't determine auth from swagger, fall back to config
     return getAuthHeader();
   } catch (error) {
     log.warning(`Error determining auth header: ${error.message}`);
@@ -757,21 +812,17 @@ function storeAuthTokenFromResponse(response, path) {
   const isAuthPath = isAuthenticationEndpoint(path);
   
   if (isAuthPath) {
-    // First check for direct token property
     for (const fieldName of tokenFieldNames) {
       if (response[fieldName] && typeof response[fieldName] === 'string') {
-        // Store as API access token (not swagger token)
         authTokens.apiAccess = response[fieldName];
         log.success(`Successfully stored API authentication token from field '${fieldName}'`);
         return;
       }
     }
     
-    // Handle nested token structures (e.g., { data: { token: '...' } })
     if (response.data && typeof response.data === 'object') {
       for (const fieldName of tokenFieldNames) {
         if (response.data[fieldName] && typeof response.data[fieldName] === 'string') {
-          // Store as API access token (not swagger token)
           authTokens.apiAccess = response.data[fieldName];
           log.success(`Successfully stored API authentication token from nested field 'data.${fieldName}'`);
           return;
@@ -779,11 +830,9 @@ function storeAuthTokenFromResponse(response, path) {
       }
     }
 
-    // Check for the token in the common structure where it's in the 'body' property
     if (response.body && typeof response.body === 'object') {
       for (const fieldName of tokenFieldNames) {
         if (response.body[fieldName] && typeof response.body[fieldName] === 'string') {
-          // Store as API access token (not swagger token)
           authTokens.apiAccess = response.body[fieldName];
           log.success(`Successfully stored API authentication token from nested field 'body.${fieldName}'`);
           return;
@@ -1069,7 +1118,8 @@ async function runServer() {
         log.info(`Attempting to fetch Swagger documentation using ${docsSource}`);
         await fetchSwaggerDoc();
       } catch (error) {
-        log.warning(`Could not automatically fetch Swagger documentation: ${error.message}`);
+        log.warning(`Could not automatically fetch Swagger documentation`);
+        log.debug(`Details: ${error.message}`);
         log.info('The AI will need to explicitly call fetch_swagger_info with the correct URL');
       }
     } else {
@@ -1079,7 +1129,7 @@ async function runServer() {
     const transport = new StdioServerTransport();
     await server.connect(transport);
     
-    log.success("API Test Server successfully started");
+    log.success("Swagger MCP Server successfully started and ready");
   } catch (error) {
     log.error("Failed to initialize:", error);
     process.exit(1);
